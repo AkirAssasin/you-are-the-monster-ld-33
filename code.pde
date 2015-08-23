@@ -338,26 +338,26 @@ void mousePressed() {
     viewStats = false;
   }
 
-  if (viewStats && mouseX.between(width - statv + 10,width - statv + 10 + (width-100)/10) && mouseY.between(height/2,height*3/4) && money >= 8) {
+  if (viewStats && mouseX.between(width - statv + 10,width - statv + 10 + (width-100)/10) && mouseY.between(height/2,height*3/4) && money >= 8 && ph > 0) {
     ph += round(10-demonskill/10);
     if (ph > mph) {ph = mph;}
     money -= 8;
   }
-  if (viewStats && mouseX.between(width - statv + 15 + (width-100)/10,width - statv + (width-100)/10 + 15 + (width-100)/10) && mouseY.between(height/2,height*3/4) && money >=(demonskill+1)*5) {
+  if (viewStats && mouseX.between(width - statv + 15 + (width-100)/10,width - statv + (width-100)/10 + 15 + (width-100)/10) && mouseY.between(height/2,height*3/4) && money >=(demonskill+1)*5 && ph > 0) {
     money -= (demonskill+1)*5;
     demonskill += 1;
     pskill += 2;
     mph += 3;
     evilm += demonskill/10;
   }
-  if (viewStats && mouseX.between(width - statv + 20 + (width-100)*2/10,width - statv + (width-100)*2/10 + 20 + (width-100)/10) && mouseY.between(height/2,height*3/4) && money >= (rskill)*6) {
+  if (viewStats && mouseX.between(width - statv + 20 + (width-100)*2/10,width - statv + (width-100)*2/10 + 20 + (width-100)/10) && mouseY.between(height/2,height*3/4) && money >= (rskill)*6 && ph > 0) {
     money -= (rskill)*6;
     rskill += 1;
   }
-  if (viewStats && mouseX.between(width - statv + 25 + (width-100)*3/10,width - statv + (width-100)*3/10 + 25 + (width-100)/10) && mouseY.between(height/2,height*3/4) && evil < 100) {
+  if (viewStats && mouseX.between(width - statv + 25 + (width-100)*3/10,width - statv + (width-100)*3/10 + 25 + (width-100)/10) && mouseY.between(height/2,height*3/4) && evil < 100 && ph > 0) {
     State = 2;
   }
-  if (viewStats && mouseX.between(width - statv + 30 + (width-100)*4/10,width - statv + (width-100)*4/10 + 30 + (width-100)/10) && mouseY.between(height/2,height*3/4) && evil > 900) {
+  if (viewStats && mouseX.between(width - statv + 30 + (width-100)*4/10,width - statv + (width-100)*4/10 + 30 + (width-100)/10) && mouseY.between(height/2,height*3/4) && evil > 900 && ph > 0) {
     State = 3;
   }
 }
