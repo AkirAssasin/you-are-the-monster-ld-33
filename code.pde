@@ -41,6 +41,7 @@ float evil = 1000/2;
 float evilm = 0;
 float demonskill = 0;
 float rskill = 1;
+int dch = 0;
 
 PImage[] knight = new PImage[7];
 PImage[] lknight = new PImage[4];
@@ -79,9 +80,11 @@ void setup() {
   tools = new ArrayList();
   textlines = new ArrayList();
   textFont(myfont,45);  
-  textlines.add(new Textline("Thou overheard the Duke of Agraolind's plans to overthrow the king.",color(255,255,255)));
-  textlines.add(new Textline("Rival knights ambush'd and slash'd thy face at the Duke's hest.",color(255,255,255)));
-  textlines.add(new Textline("Thou escap'd and vow'd f'r revenge. The time hath come!",color(255,255,255)));
+  textlines.add(new Textline("The Duke of Agraolind blindly declares thou trait'r and thou wast ambush'd by rival knights.",color(255,150,150)));
+  textlines.add(new Textline("Half dead and scarr'd f'r life, thou wast restor'd to health by an Angel and a Flibbertigibbet.",color(255,255,150)));
+  textlines.add(new Textline("The Angel will get thou to Heaven if thou can forgive those who done thou wrong.",color(150,150,255)));
+  textlines.add(new Textline("The Flibbertigibbet will help thou send their souls to Hell if thou become a blood-thirsty Cockatrice.",color(255,200,200)));
+  textlines.add(new Textline("What will thou doth?",color(255,255,150)));
 }
  
 void draw() {
@@ -97,12 +100,6 @@ void draw() {
     c.update();
     if (c.hp == -13458) {contacts.remove(i);}
   }
-  for (int i=tools.size()-1; i>=0; i--) {
-    Particle t = (Tool) tools.get(i);
-    t.update();
-    if (t.h <= 0) {tools.remove(i);}
-  }
-
   for (int i=textlines.size()-1; i>=0; i--) {
     Particle l = (Textline) textlines.get(i);
     l.update();
@@ -134,14 +131,16 @@ void draw() {
     if (killornot) {text("'r not to kill?",width - width/6,theight);} else {
       if (restime <= 0) {text("Rob the Duke",width - width/6,theight);} else {
         fill(150);
+        stroke(255);
+        line(width/2 + width/10,theight + cheight*3/4,width/2 + width/10 + (width - width/10 - width/2 - width/10)*((500 - restime)/500),theight + cheight*3/4);
         stroke(150);
-        text("Thou need to rest!",width - width/6,theight);
+        text("Thou need to recover!",width - width/6,theight);
       }
     }
     fill(0,0);
     rect(width/2,theight,width/2 - 1,cheight-2);
   }
-  if (random(1) > 0.99 && isChallenging && !hasChallenger) {
+  if (random(1) > 0.95 && isChallenging && !hasChallenger) {
       if (contacts.size() >= 1 && random(1) > 0.9) {
         hasChallenger = true;
         Particle c = (Contact) contacts.get(round(random(contacts.size()-1)));
@@ -151,7 +150,30 @@ void draw() {
         contacts.add(new Contact());
       }
   }
-  drawKnight(width/6 + fdist,theight-knight[0].width,color(255,0,0),color(255,0),color(255,0),false,true,true);
+  if (random(1) > 0.999 && !isChallenging && !hasChallenger && !killornot && dch > 5) {
+      isChallenging = true;
+      contacts.add(new Contact());
+  }
+  if (State != 0 && ph > 0) {ph -= 1;}
+  if (ph > 0) {drawKnight(width/6 + fdist,theight-knight[0].width,color(255,0,0),color(255,0),color(255,0),false,true,true);} else {
+    drawLost(width/6 + fdist,theight-knight[0].width,color(255,0,0),color(255,0),color(255,0),true,true);
+  }
+  if (ph <= 0) {
+    fill(255);
+    textAlign(CENTER,CENTER);
+    if (State == 2) {
+      text("Tragedy... thou can't trust Flibbertigibbets...",width/2,height/2);
+    } else if (State == 3) {
+      text("Thy soul ascend'd.",width/2,height/2);
+    } else {
+      text("Tragedy...",width/2,height/2);
+    }
+  }
+  for (int i=tools.size()-1; i>=0; i--) {
+    Particle t = (Tool) tools.get(i);
+    t.update();
+    if (t.h <= 0) {tools.remove(i);}
+  }
   if (viewStats) {
     if (statv < width/2) {statv += dist(statv,0,width/2,0)/4;}
   } else {
@@ -167,7 +189,9 @@ void draw() {
     stroke(255);
     fill(0);
     rect(width - statv,height/4,statv,height/2);
-    drawKnight(width - statv,height/4,color(255,0,0),color(255,0),color(255,0),false,true,false);
+    if (ph > 0) {drawKnight(width - statv,height/4,color(255,0,0),color(255,0),color(255,0),false,true,false);} else {
+      drawLost(width - statv,height/4,color(255,0,0),color(255,0),color(255,0),true,false);
+    }
     textAlign(LEFT,TOP);
     fill(255);
     if (evil < 100) {
@@ -203,7 +227,7 @@ void draw() {
   textAlign(LEFT,TOP);
   text(money + " Chinks",width - statv + knight[0].width, height/4 + 80);
   fill(255);
-  text("Skill level: " + pskill,width - statv + knight[0].width, height/4 + 50);
+  text("Skill level: " + pskill + " (+" + demonskill*2 + ")",width - statv + knight[0].width, height/4 + 50);
   text(ph + "/" + mph + " HP",width - statv + knight[0].width, height/4 + 110);
   stroke(255);
   fill(0);
@@ -267,7 +291,9 @@ void mousePressed() {
       hasChallenger = false;
       tools.add(new Tool(width - width/6 - fdist + knight[0].width/2));
     } else  if (!isChallenging) {
-      textlines.add(new Textline("Thou wrote to the Duke: Come face me, foul beast!",color(255,255,150)));
+      dch += 1;
+      evilm += 0.5;
+      textlines.add(new Textline("Thou wrote a letter full of insults to the Duke.",color(255,255,150)));
       isChallenging = true;
     }
   }
@@ -320,6 +346,7 @@ void mousePressed() {
   if (viewStats && mouseX.between(width - statv + 15 + (width-100)/10,width - statv + (width-100)/10 + 15 + (width-100)/10) && mouseY.between(height/2,height*3/4) && money >=(demonskill+1)*5) {
     money -= (demonskill+1)*5;
     demonskill += 1;
+    pskill += 2;
     mph += 3;
     evilm += demonskill/10;
   }
@@ -503,20 +530,22 @@ class Contact {
         text((100 - round(dc*100)) + "/" + round(dc*100),width/2,height);
         text("Chances",width/2,height - 50);
         textAlign(LEFT,BOTTOM);
-        text(ph + "/" + mph + " HP",0,height);
-        textAlign(RIGHT,BOTTOM);
-        text(hp + "/" + mhp + " HP",width,height);
-        fdist += (((abs((speak%30 - 15)/15))*(width/2 - width/6)) - fdist)/4;
+        if (ph > 0) {
+          text(ph + "/" + mph + " HP",0,height);
+          textAlign(RIGHT,BOTTOM);
+          text(hp + "/" + mhp + " HP",width,height);
+          fdist += (((abs((speak%30 - 15)/15))*(width/2 - width/6)) - fdist)/4;
+        }
         drawKnight(width - width/6 - fdist,theight - knight[0].width,armor[0],armor[1],armor[2],false,hasHelm,false);
       } else {
         drawKnight(width - width/6,theight - knight[0].width,armor[0],armor[1],armor[2],true,hasHelm,false);
       }
-      if (speak > 135 && speak%30 == 0) {
-        if (random(1) > dc) {
+      if (speak > 135 && (speak%30 == 0 || (speak%15 == 0 && ph <= 0))) {
+        if (random(1) > dc && ph > 0) {
           tools.add(new Tool(width - width/6 - fdist + knight[0].width/2));
           if (trust < 80) {hp -= round(random(pskill));}
             textlines.add(new Textline("Thou hit the " + order + " with a swing of thy blade. ",color(255,255,150)));
-          if (random(1) > 0.9 || trust >= 80 || hp <= 0) {
+          if (random(1) > dc || trust >= 80 || hp <= 0) {
             action = 2;
             if (trust < 40) {
               textlines.add(new Textline(order + " " + name + ": 'Prithee let me go!'",color(255,200,200)));
@@ -591,7 +620,8 @@ class Textline {
   
   void update() {
     textAlign(LEFT,CENTER);
-    if (y + 45 >= theight - knight[0].width + 16) {fill(0);} else {fill(c);}
+    if (ph <= 0) {y -= dist(-70,0,y,0)/10;}
+    fill(c);
     text(s,0,y + 20);
   }
 }
